@@ -1,12 +1,6 @@
 # 🚀 TaskTeam
 
-**TaskTeam** es un proyecto que proporciona métodos CRUD para la gestión de:
-
-- 👤 **Usuarios**
-- 📂 **Proyectos**
-- ✅ **Tareas**
-
-Además, implementa un sistema de autenticación de usuarios seguro utilizando JWT (JSON Web Tokens). ✨
+**TaskTeam** es una API REST diseñada para facilitar la gestión de tareas y proyectos en equipos de trabajo. Permite a los usuarios crear y administrar proyectos de manera eficiente, asignar tareas específicas dentro de esos proyectos, y realizar un seguimiento del progreso del equipo. La aplicación ofrece un sistema completo de autenticación de usuarios utilizando JWT, asegurando que solo los miembros autorizados puedan acceder y modificar los datos del sistema. Con un enfoque en la simplicidad y la flexibilidad, **TaskTeam** está orientado a equipos que necesitan organizar sus flujos de trabajo y mejorar su colaboración en proyectos. ✨
 
 ---
 
@@ -37,4 +31,4 @@ Además, implementa un sistema de autenticación de usuarios seguro utilizando J
 - Registro e inicio de sesión seguro.
 - Generación y validación de tokens JWT.
 
-
+---

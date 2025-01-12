@@ -31,4 +31,8 @@
 - Registro e inicio de sesión seguro.
 - Generación y validación de tokens JWT.
 
+<<<<<<< HEAD
 ---
+=======
+---
+>>>>>>> 4c76c5ed84bb9ca3e550bd532ec3a1fa51139732

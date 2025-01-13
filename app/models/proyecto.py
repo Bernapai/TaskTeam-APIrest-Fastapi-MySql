@@ -1,5 +1,5 @@
 from sqlalchemy import Table, Column, Integer, String,  ForeignKey
-from db import meta, engine
+from database import meta, engine
 
 Proyecto = Table('proyectos', meta, 
     Column('id', Integer, primary_key=True),

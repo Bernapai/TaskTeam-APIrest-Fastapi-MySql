@@ -1,5 +1,5 @@
 from sqlalchemy import Table, Column, Integer, String,  ForeignKey
-from db import meta, engine
+from database import meta, engine
 
 
 Tarea = Table('tareas', meta, 
@@ -13,3 +13,6 @@ Tarea = Table('tareas', meta,
 )
 
 meta.create_all(engine)
+
+
+

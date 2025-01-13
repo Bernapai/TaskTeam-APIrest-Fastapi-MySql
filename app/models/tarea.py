@@ -9,7 +9,7 @@ Tarea = Table('tareas', meta,
     Column('proyecto', Integer, ForeignKey('proyectos.id')),
     Column('estado', String(50)),
     Column('fecha_inicio', String(50)),
-    Column('Responsable', String(50)),
+    Column('responsable', String(50)),
 )
 
 meta.create_all(engine)

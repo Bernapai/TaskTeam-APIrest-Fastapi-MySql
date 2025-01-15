@@ -28,7 +28,7 @@ def get_user (email: str):
 def get_user (password: str):
     return conn.execute(users.select().where(users.c.password == password)).fetchall()
 
-@user.post('/users')
+@user.post('/users/create')
 def create_user (user: User):
     conn.execute(users.insert().values(
         nombre = user.nombre,

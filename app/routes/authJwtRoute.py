@@ -29,8 +29,22 @@ def  verify_token(token: str = Depends(create_token)):
 
 @auth.post('/login')
 def login(user: User):
-    user =  conn.execute(User.select().where(User.c.nombre == user.nombre, User.c.apellido == user.apellido)
-    ).fetchone()
+     # Consulta a la base de datos para verificar las credenciales
+    user =  conn.execute(User.select().where(User.c.nombre == user.nombre, User.c.apellido == user.apellido)).fetchone()
+
+    # Validación del usuario
+    if not user:
+        raise HTTPException(status_code=401, detail="Nombre o apellido incorrectos")
+    
+    # Crear el token si las credenciales son correctas
+    token_data = {
+        "user_id": result.id,
+        "nombre": result.nombre,
+        "apellido": result.apellido,
+    }
+    token = create_token(token_data)
+
+    return {"token": token}
    
     
     

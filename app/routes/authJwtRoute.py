@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends , HTTPException
 import jwt  
 from app.models.user import User
+from sqlalchemy import and_
 from database import conn
 import datetime
 
@@ -30,17 +31,17 @@ def  verify_token(token: str = Depends(create_token)):
 @auth.post('/login')
 def login(user: User):
      # Consulta a la base de datos para verificar las credenciales
-    user =  conn.execute(User.select().where(User.c.nombre == user.nombre, User.c.apellido == user.apellido)).fetchone()
+    db_user =  conn.execute(User.select().where(and_(User.nombre == user.nombre, User.apellido == user.apellido))).fetchone()
 
     # Validación del usuario
-    if not user:
+    if not db_user:
         raise HTTPException(status_code=401, detail="Nombre o apellido incorrectos")
     
     # Crear el token si las credenciales son correctas
     token_data = {
-        "user_id": result.id,
-        "nombre": result.nombre,
-        "apellido": result.apellido,
+        "user_id": db_user.id,
+        "nombre": db_user.nombre,
+        "apellido": db_user.apellido,
     }
     token = create_token(token_data)
 

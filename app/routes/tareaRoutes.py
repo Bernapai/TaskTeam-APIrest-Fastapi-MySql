@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.models.tarea import Tarea
 from database import conn
+from app.routes.authJwtRoute import verify_token
 
 tarea = APIRouter()
 
@@ -29,7 +30,7 @@ def get_tarea (responsable: str):
     return conn.execute(tareas.select().where(tareas.c.responsable == responsable)).fetchall()
 
 @tarea.post('/tareas')
-def create_tarea (tarea: Tarea):
+def create_tarea (tarea: Tarea, token: dict = Depends(verify_token)):
     conn.execute(tareas.insert().values(
         nombre = tarea.nombre,
         descripcion = tarea.descripcion,
@@ -41,7 +42,7 @@ def create_tarea (tarea: Tarea):
     return conn.execute(tareas.select()).fetchall()
 
 @tarea.put('/tareas/{tarea_id}')
-def update_tarea (tarea_id: int, tarea: Tarea):
+def update_tarea (tarea_id: int, tarea: Tarea , token: dict = Depends(verify_token)):
     conn.execute(tareas.update().values(
         nombre = tarea.nombre,
         descripcion = tarea.descripcion,
@@ -53,7 +54,7 @@ def update_tarea (tarea_id: int, tarea: Tarea):
     return conn.execute(tareas.select()).fetchall()
 
 @tarea.delete('/tareas/{tarea_id}')
-def delete_tarea (tarea_id: int):
+def delete_tarea (tarea_id: int, token: dict = Depends(verify_token)):
     conn.execute(tareas.delete().where(tareas.c.id == tarea_id))
     return conn.execute(tareas.select()).fetchall()
 

@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.models.proyecto import Proyecto
 from database import conn
+from app.routes.authJwtRoute import verify_token
 
 proyecto = APIRouter()
 
@@ -25,7 +26,7 @@ def get_proyecto (lider: int):
     return conn.execute(proyectos.select().where(proyectos.c.lider == lider)).fetchall()
 
 @proyecto.post('/proyectos')
-def create_proyecto (proyecto: Proyecto):
+def create_proyecto (proyecto: Proyecto, token: dict = Depends(verify_token)):
     conn.execute(proyectos.insert().values(
         nombre = proyecto.nombre,
         descripcion = proyecto.descripcion,
@@ -37,7 +38,7 @@ def create_proyecto (proyecto: Proyecto):
     return conn.execute(proyectos.select()).fetchall()
 
 @proyecto.put('/proyectos/{proyecto_id}')
-def update_proyecto (proyecto_id: int, proyecto: Proyecto):
+def update_proyecto (proyecto_id: int, proyecto: Proyecto , token: dict = Depends(verify_token)):
     conn.execute(proyectos.update().values(
         nombre = proyecto.nombre,
         descripcion = proyecto.descripcion,
@@ -49,7 +50,7 @@ def update_proyecto (proyecto_id: int, proyecto: Proyecto):
     return conn.execute(proyectos.select()).fetchall()
 
 @proyecto.delete('/proyectos/{proyecto_id}')
-def delete_proyecto (proyecto_id: int):
+def delete_proyecto (proyecto_id: int, token: dict = Depends(verify_token)):
     conn.execute(proyectos.delete().where(proyectos.c.id == proyecto_id))
     return conn.execute(proyectos.select()).fetchall()
 

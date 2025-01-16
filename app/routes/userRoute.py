@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.models.user import User
 from database import conn
+from app.routes.authJwtRoute import verify_token
 
 user = APIRouter()
 
@@ -29,7 +30,7 @@ def get_user (password: str):
     return conn.execute(users.select().where(users.c.password == password)).fetchall()
 
 @user.post('/users/create')
-def create_user (user: User):
+def create_user (user: User, token: dict = Depends(verify_token)):
     conn.execute(users.insert().values(
         nombre = user.nombre,
         apellido = user.apellido,
@@ -39,7 +40,7 @@ def create_user (user: User):
     return conn.execute(users.select()).fetchall()
 
 @user.put('/users/{user_id}')
-def update_user (user_id: int, user: User):
+def update_user (user_id: int, user: User, token: dict = Depends(verify_token)):
     conn.execute(users.update().values(
         nombre = user.nombre,
         apellido = user.apellido,
@@ -49,7 +50,7 @@ def update_user (user_id: int, user: User):
     return conn.execute(users.select()).fetchall()
 
 @user.delete('/users/{user_id}')
-def delete_user (user_id: int):
+def delete_user (user_id: int, token: dict = Depends(verify_token)):
     conn.execute(users.delete().where(users.c.id == user_id))
     return conn.execute(users.select()).fetchall()
 

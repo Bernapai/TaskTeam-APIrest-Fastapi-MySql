@@ -1,48 +1,53 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import jwt
-from app.models.user import User
-from sqlalchemy import and_, select
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
+from sqlalchemy.sql import select
 from database import conn
+from models import User
+import jwt
 import datetime
 
+# Clave secreta para JWT (cámbiala por una más segura en producción)
+SECRET_KEY = "jmb28()"
+
+# Router para las rutas de autenticación
 auth = APIRouter()
 
-SECRET_KEY = "jm2057bb"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 50
-security = HTTPBearer()
+# Esquema para login
+class LoginSchema(BaseModel):
+    nombre: str
+    apellido: str
 
-def create_token(data: dict):
-    to_encode = data.copy()
-    expire = datetime.datetime.utcnow() + datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+# Función para crear un token
+def create_token(user):
+    payload = {
+        'id': user['id'],
+        'nombre': user['nombre'],
+        'apellido': user['apellido'],
+        'rol': user['rol'],
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Token expira en 1 hora
+    }
+    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+    return token
 
-def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+# Función para verificar un token
+def verify_token(token: str):
     try:
-        token = credentials.credentials
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         return payload
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=401, detail="Token expirado")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Token inválido")
 
-@auth.post('/login')
-def login(user: User):
-    db_user = conn.execute(
-        select(User).where(and_(User.c.nombre == user.nombre, User.c.apellido == user.apellido))
-    ).fetchone()
+# Ruta para login
+@router.post('/login')
+async def login(data: LoginSchema):
+    query = select([User]).where(User.c.nombre == data.nombre).where(User.c.apellido == data.apellido)
+    result = conn.execute(query).fetchone()
 
-    if db_user is None:
-        raise HTTPException(status_code=401, detail="Nombre o apellido incorrectos")
-    
-    token_data = {
-        "user_id": db_user.id,
-        "nombre": db_user.nombre,
-        "apellido": db_user.apellido,
-    }
-    token = create_token(token_data)
-    return {"token": token}
+    if result:
+        user = dict(result)
+        token = create_token(user)
+        return {"message": "Login exitoso", "token": token}
+    else:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")

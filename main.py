@@ -9,5 +9,6 @@ app = FastAPI()
 app.include_router(user)
 app.include_router(proyecto)
 app.include_router(tarea)
+app.include_router(auth)
 
 

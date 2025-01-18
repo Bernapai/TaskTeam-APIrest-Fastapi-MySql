@@ -1,6 +1,7 @@
+
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, and_
 from database import conn
 from app.models.user import User
 import jwt
@@ -40,14 +41,25 @@ def verify_token(token: str):
         raise HTTPException(status_code=401, detail="Token inválido")
 
 # Ruta para login
-@auth.post('/login')
-async def login(data: LoginSchema):
-    query = select([User]).where(User.c.nombre == data.nombre).where(User.c.apellido == data.apellido)
-    result = conn.execute(query).fetchone()
+from sqlalchemy import and_
 
-    if result:
-        user = dict(result)
-        token = create_token(user)
-        return {"message": "Login exitoso", "token": token}
-    else:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+@auth.post('/login')
+def login(data: LoginSchema):
+    # Construcción de la consulta con condiciones correctas
+    query = select(User).where(and_(User.c.nombre == data.nombre, User.c.apellido == data.apellido))
+
+    try:
+        # Ejecutar la consulta
+        result = conn.execute(query).first()
+
+        if result:
+            # Convertir la fila resultante en un diccionario
+            user_dict = dict(result._mapping)  # `_mapping` convierte a diccionario
+            token = create_token(user_dict)
+            return {"message": "Login exitoso", "token": token}
+        else:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    except Exception as e:
+        # Manejo de errores en la ejecución
+        raise HTTPException(status_code=500, detail=f"Error ejecutando la consulta: {e}")
+

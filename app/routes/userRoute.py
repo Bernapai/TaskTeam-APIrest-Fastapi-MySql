@@ -1,58 +1,75 @@
-from fastapi import APIRouter,Depends
-from app.models.user import User
+from fastapi import APIRouter, HTTPException
+from sqlalchemy import select
 from database import conn
-from app.routes.authJwtRoute import verify_token
+from app.models.user import User
 
 user = APIRouter()
 
 @user.get('/users')
-def get_users ():
-    return conn.execute(users.select()).fetchall()
+def get_users():
+    return conn.execute(select(User)).fetchall()
 
 @user.get('/users/{user_id}')
-def get_user (user_id: int):
-    return conn.execute(users.select().where(users.c.id == user_id)).fetchall()
+def get_user_by_id(user_id: int):
+    result = conn.execute(select(User).where(User.c.id == user_id)).fetchone()
+    if result:
+        return result
+    else:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-@user.get('/users/{nombre : str}')
-def get_user (nombre: str):
-    return conn.execute(users.select().where(users.c.nombre == nombre)).fetchall()
+@user.get('/users/nombre/{nombre}')
+def get_user_by_nombre(nombre: str):
+    result = conn.execute(select(User).where(User.c.nombre == nombre)).fetchall()
+    if result:
+        return result
+    else:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-@user.get('/users/{apellido : str}')
-def get_user (apellido: str):
-    return conn.execute(users.select().where(users.c.apellido == apellido)).fetchall()
+@user.get('/users/apellido/{apellido}')
+def get_user_by_apellido(apellido: str):
+    result = conn.execute(select(User).where(User.c.apellido == apellido)).fetchall()
+    if result:
+        return result
+    else:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-@user.get('/users/{email : str}')
-def get_user (email: str):
-    return conn.execute(users.select().where(users.c.email == email)).fetchall()
+@user.get('/users/email/{email}')
+def get_user_by_email(email: str):
+    result = conn.execute(select(User).where(User.c.email == email)).fetchall()
+    if result:
+        return result
+    else:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-@user.get('/users/{password : str}')
-def get_user (password: str):
-    return conn.execute(users.select().where(users.c.password == password)).fetchall()
+@user.get('/users/password/{password}')
+def get_user_by_password(password: str):
+    result = conn.execute(select(User).where(User.c.password == password)).fetchall()
+    if result:
+        return result
+    else:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
 @user.post('/users/create')
-def create_user (user: User, token: dict = Depends(verify_token)):
-    conn.execute(users.insert().values(
-        nombre = user.nombre,
-        apellido = user.apellido,
-        email = user.email,
-        password = user.password
+def create_user(user: User):
+    conn.execute(User.insert().values(
+        nombre=user.nombre,
+        apellido=user.apellido,
+        email=user.email,
+        password=user.password
     ))
-    return conn.execute(users.select()).fetchall()
+    return {"message": "Usuario creado exitosamente"}
 
 @user.put('/users/{user_id}')
-def update_user (user_id: int, user: User, token: dict = Depends(verify_token)):
-    conn.execute(users.update().values(
-        nombre = user.nombre,
-        apellido = user.apellido,
-        email = user.email,
-        password = user.password
-    ).where(users.c.id == user_id))
-    return conn.execute(users.select()).fetchall()
+def update_user(user_id: int, user: User):
+    conn.execute(User.update().values(
+        nombre=user.nombre,
+        apellido=user.apellido,
+        email=user.email,
+        password=user.password
+    ).where(User.c.id == user_id))
+    return {"message": "Usuario actualizado exitosamente"}
 
 @user.delete('/users/{user_id}')
-def delete_user (user_id: int, token: dict = Depends(verify_token)):
-    conn.execute(users.delete().where(users.c.id == user_id))
-    return conn.execute(users.select()).fetchall()
-
-
-    
+def delete_user(user_id: int):
+    conn.execute(User.delete().where(User.c.id == user_id))
+    return {"message": "Usuario eliminado exitosamente"}

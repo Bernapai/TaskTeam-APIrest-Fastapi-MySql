@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Depends
 from app.models.tarea import Tarea
 from database import conn
 from app.routes.authJwtRoute import verify_token

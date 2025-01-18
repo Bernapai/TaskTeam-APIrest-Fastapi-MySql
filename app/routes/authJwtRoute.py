@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from sqlalchemy.sql import select
 from database import conn
-from models import User
+from app.models.user import User
 import jwt
 import datetime
 
@@ -40,7 +40,7 @@ def verify_token(token: str):
         raise HTTPException(status_code=401, detail="Token inválido")
 
 # Ruta para login
-@router.post('/login')
+@auth.post('/login')
 async def login(data: LoginSchema):
     query = select([User]).where(User.c.nombre == data.nombre).where(User.c.apellido == data.apellido)
     result = conn.execute(query).fetchone()

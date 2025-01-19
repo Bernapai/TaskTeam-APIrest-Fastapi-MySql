@@ -1,12 +1,9 @@
-
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.sql import select, and_
 from database import conn
 from app.models.user import User
 from app.schemas.authSchema import LoginSchema
 from app.utils.jwt import create_token
-
-
 
 # Router para las rutas de autenticación
 auth = APIRouter()
@@ -34,4 +31,3 @@ def login(data: LoginSchema):
     token = AuthService.create_token(user_dict)
     return {"message": "Login exitoso", "token": token}
 
-    

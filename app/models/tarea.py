@@ -1,7 +1,6 @@
 from sqlalchemy import Table, Column, Integer, String,  ForeignKey
 from database import meta, engine
 
-
 Tarea = Table('tareas', meta, 
     Column('id', Integer, primary_key=True),
     Column('nombre', String(50)),

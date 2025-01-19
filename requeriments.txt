@@ -1,0 +1,6 @@
+fastapi==0.115.6
+pydantic_core==2.27.2
+PyJWT==2.10.1
+PyMySQL==1.1.1
+SQLAlchemy==2.0.37
+uvicorn==0.34.0

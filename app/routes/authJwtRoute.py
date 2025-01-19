@@ -25,7 +25,7 @@ def verify_user_in_db(nombre: str, apellido: str):
 @auth.post('/login')
 def login(data: LoginSchema):
     # Verificamos si el usuario existe en la base de datos
-    user_dict = UserService.verify_user_in_db(data.nombre, data.apellido)
+    user_dict = verify_user_in_db(data.nombre, data.apellido)
     
     if not user_dict:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")

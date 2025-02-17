@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 from database import conn
 from app.models.tarea import Tarea
+from app.schemas.tareaSchema import TareaSchema 
 
 tarea = APIRouter()
 
@@ -50,7 +51,7 @@ def get_tarea_by_responsable(responsable: str):
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
 
 @tarea.post('/tareas')
-def create_tarea(tarea: Tarea):
+def create_tarea(tarea: TareaSchema):
     conn.execute(Tarea.insert().values(
         nombre=tarea.nombre,
         descripcion=tarea.descripcion,
@@ -62,7 +63,7 @@ def create_tarea(tarea: Tarea):
     return {"message": "Tarea creada exitosamente"}
 
 @tarea.put('/tareas/{tarea_id}')
-def update_tarea(tarea_id: int, tarea: Tarea):
+def update_tarea(tarea_id: int, tarea: TareaSchema):
     conn.execute(Tarea.update().values(
         nombre=tarea.nombre,
         descripcion=tarea.descripcion,

@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 from database import conn
 from app.models.proyecto import Proyecto
+from app.schemas.proyectoSchema import ProyectoSchema
 
 proyecto = APIRouter()
 
@@ -42,7 +43,7 @@ def get_proyecto_by_lider(lider: int):
         raise HTTPException(status_code=404, detail="Proyecto no encontrado")
 
 @proyecto.post('/proyectos')
-def create_proyecto(proyecto: Proyecto):
+def create_proyecto(proyecto: ProyectoSchema):
     conn.execute(Proyecto.insert().values(
         nombre=proyecto.nombre,
         descripcion=proyecto.descripcion,
@@ -54,7 +55,7 @@ def create_proyecto(proyecto: Proyecto):
     return {"message": "Proyecto creado exitosamente"}
 
 @proyecto.put('/proyectos/{proyecto_id}')
-def update_proyecto(proyecto_id: int, proyecto: Proyecto):
+def update_proyecto(proyecto_id: int, proyecto: ProyectoSchema):
     conn.execute(Proyecto.update().values(
         nombre=proyecto.nombre,
         descripcion=proyecto.descripcion,

@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 from database import conn
 from app.models.user import User
+from app.schemas.userSchema import UserSchema
 
 user = APIRouter()
 
@@ -50,7 +51,7 @@ def get_user_by_password(password: str):
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
 @user.post('/users/create')
-def create_user(user: User):
+def create_user(user: UserSchema):
     conn.execute(User.insert().values(
         nombre=user.nombre,
         apellido=user.apellido,
@@ -60,7 +61,7 @@ def create_user(user: User):
     return {"message": "Usuario creado exitosamente"}
 
 @user.put('/users/{user_id}')
-def update_user(user_id: int, user: User):
+def update_user(user_id: int, user: UserSchema):
     conn.execute(User.update().values(
         nombre=user.nombre,
         apellido=user.apellido,

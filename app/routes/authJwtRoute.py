@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from sqlalchemy.sql import select, and_
 from database import conn
 from app.models.user import User
-from app.schemas.authSchema import LoginSchema
-from app.utils.jwt import create_token
+from app.schemas.loginSchema import LoginSchema
+from app.utils.jwt import AuthService
 
 # Router para las rutas de autenticación
 auth = APIRouter()
